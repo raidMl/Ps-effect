@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Typographic Portrait</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #000;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: #fff;
+    }
+    h1 {
+      margin-bottom: 20px;
+      font-size: 2rem;
+      letter-spacing: 1.5px;
+    }
+    #controls {
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    input, button {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      background-color: #222;
+      color: #fff;
+      width: 300px;
+    }
+    button {
+      background-color: #ff4081;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #ff1f6a;
+    }
+    canvas {
+      box-shadow: 0 0 40px rgba(255,255,255,0.1);
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Typographic Portrait</h1>
+  <div id="controls">
+    <input type="file" id="imageUpload" accept="image/*" />
+    <input type="text" id="textInput" placeholder="Enter your stylized text" />
+    <button onclick="generateTextPortrait()">Generate</button>
+  </div>
+  <canvas id="canvas" width="600" height="800"></canvas>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let image = new Image();
+    let selection = null;
+
+    // Upload image
+    document.getElementById('imageUpload').addEventListener('change', e => {
+      const reader = new FileReader();
+      reader.onload = event => {
+        image.src = event.target.result;
+        image.onload = () => {
+          ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        };
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    });
+
+    // Select region
+    let startX, startY, isDragging = false;
+    canvas.addEventListener('mousedown', e => {
+      const rect = canvas.getBoundingClientRect();
+      startX = e.clientX - rect.left;
+      startY = e.clientY - rect.top;
+      isDragging = true;
+    });
+
+    canvas.addEventListener('mouseup', e => {
+      const rect = canvas.getBoundingClientRect();
+      const endX = e.clientX - rect.left;
+      const endY = e.clientY - rect.top;
+      selection = {
+        x: Math.min(startX, endX),
+        y: Math.min(startY, endY),
+        width: Math.abs(endX - startX),
+        height: Math.abs(endY - startY)
+      };
+      isDragging = false;
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    });
+
+    // Brightness function
+    const getBrightness = (r, g, b) => 0.299 * r + 0.587 * g + 0.114 * b;
+
+    // Render portrait
+    function generateTextPortrait() {
+      if (!selection) {
+        alert("Select face/body area with mouse first!");
+        return;
+      }
+
+      const text = document.getElementById("textInput").value || "BOLD STYLISH CREATIVE ARTISTIC";
+      const words = text.split(" ");
+      const fontSize = 10;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+      let wordIndex = 0;
+      const { x, y, width, height } = selection;
+
+      for (let py = y; py < y + height; py += fontSize) {
+        for (let px = x; px < x + width; px += fontSize * 1.3) {
+          const i = (py * canvas.width + px) * 4;
+          const r = imgData.data[i];
+          const g = imgData.data[i + 1];
+          const b = imgData.data[i + 2];
+          const a = imgData.data[i + 3];
+
+          if (a < 100 || (r < 30 && g < 30 && b < 30)) continue;
+
+          const brightness = getBrightness(r, g, b);
+          ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+          ctx.shadowColor = "rgba(255,255,255,0.1)";
+          ctx.shadowBlur = 2;
+
+          if (brightness < 60) {
+            ctx.font = `bold ${fontSize + 4}px Arial`;
+          } else if (brightness < 120) {
+            ctx.font = `bold ${fontSize + 2}px Arial`;
+          } else {
+            ctx.font = `${fontSize}px Arial`;
+          }
+
+          ctx.fillText(words[wordIndex % words.length], px, py);
+          wordIndex++;
+        }
+      }
+    }
+  </script>
+</body>
+</html>

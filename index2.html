@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Text Overlay Effect</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #121212;
+      font-family: 'Arial', sans-serif;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .image-container {
+      position: relative;
+      width: 900px;
+      height: 800px;
+      background-image: url('vi.jpg');
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .text-overlay {
+      position: absolute;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.6); /* creates contrast with the image */
+      color: #ff0303e5;
+      font-weight: bold;
+      font-size: 1.1rem;
+      padding: 30px;
+      line-height: 1.6;
+      overflow-y: auto;
+      mix-blend-mode: screen;
+    }
+  </style>
+</head>
+<body>
+  <div class="image-container">
+    <div class="text-overlay">
+      PROGRAMMING JS JSON REACT NEXT JS NEST JS LARAVEL PHP NODE MONGO DB PYTHON...
+      <!-- Repeat text as needed -->
+    </div>
+-mode: screen;
+    }
+  </style>
+</head>
+<body>
+  <div class="image-container">
+    <div class="text-overlay">
+      PROGRAMMING JS JSON REACT NEXT JS NEST JS LARAVEL PHP NODE MONGO DB PYTHON...
+      <!-- Repeat text as needed -->
+    </div>
+  </div>
+</body>
+  </div>
+</body>
+</html>
